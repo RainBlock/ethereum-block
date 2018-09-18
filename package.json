@@ -1,6 +1,6 @@
 {
   "name": "@rainblock/ethereum-block",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "An implementation of the Ethereum schema for typescript",
   "main": "dist/node.js",
   "browser": {
