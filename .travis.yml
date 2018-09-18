@@ -1,0 +1,60 @@
+language: node_js
+node_js:
+- node
+- '10'
+env:
+  global:
+  - DISPLAY=:99.0
+  matrix:
+  - CXX=g++-4.8 TEST_SUITE=test:node
+addons:
+  chrome: stable
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - g++-4.8
+before_install:
+- sh -e /etc/init.d/xvfb start
+matrix:
+  fast_finish: true
+  include:
+  - os: linux
+    node_js: '10'
+    env: CXX=g++-4.8 TEST_SUITE=test:browser
+before_script:
+- npm install -g typescript gts typedoc
+script: npm run $TEST_SUITE
+before_deploy:
+- npm run typedoc
+- npm pack
+deploy:
+- provider: pages
+  skip-cleanup: true
+  github-token: "$GITHUB_TOKEN"
+  keep-history: true
+  local_dir: docs
+  committer-from-gh: true
+  on:
+    branch: master
+    node: '10'
+    condition: "$TEST_SUITE = test:node"
+- provider: releases
+  api_key: "$GITHUB_TOKEN"
+  file_glob: true
+  file: bigint-buffer-*.tgz
+  skip_cleanup: true
+  on:
+    branch: master
+    node: '10'
+    condition: "$TEST_SUITE = test:node"
+    tags: true
+- provider: npm
+  api_key: "$NPM_TOKEN"
+  skip_cleanup: true
+  email: mwei@cs.ucsd.edu
+  on:
+    branch: master
+    node: '10'
+    condition: "$TEST_SUITE = test:node"
+    tags: true
