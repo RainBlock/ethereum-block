@@ -22,8 +22,6 @@ matrix:
   - os: linux
     node_js: '10'
     env: CXX=g++-4.8 TEST_SUITE=test:browser
-before_script:
-- npm install -g typescript gts typedoc
 script: npm run $TEST_SUITE
 before_deploy:
 - npm run typedoc

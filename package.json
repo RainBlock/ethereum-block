@@ -16,7 +16,7 @@
     "test:node": "mocha -r ts-node/register src/**/*.spec.ts --timeout 40000",
     "benchmark": "node -r ts-node/register src/ethereum-block.bench.ts",
     "rebuild": "node-gyp rebuild",
-    "typedoc": "typedoc --out docs $(pwd)/src --target es6 --mode file --tsconfig ./tsconfig.json --excludePrivate --excludeProtected --excludeNotExported --exclude '**/*+(spec|bench).ts'",
+    "typedoc": "typedoc --out docs $(pwd)/src $(pwd)/helper --target es6 --mode file --tsconfig ./tsconfig.json --excludePrivate --excludeProtected --excludeNotExported --exclude '**/*+(spec|bench).ts'",
     "check": "gts check",
     "clean": "gts clean",
     "compile": "mkdir -p dist; tsc -p .;rollup -c > dist/node.js && BROWSER=true rollup -c > dist/browser.js; cp build/src/*.d.ts dist",
