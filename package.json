@@ -1,6 +1,6 @@
 {
   "name": "@rainblock/ethereum-block",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "An implementation of the Ethereum schema for typescript",
   "main": "dist/node.js",
   "browser": {
@@ -88,7 +88,7 @@
     "Michael Wei <mwei@vmware.com> (https://github.com/no2chem)"
   ], "files" : [
     "/dist",
-    "/ext/xkcp/lib/high/Keccak/KeccakSpongeWidth1600.c",
+    "/ext/xkcp/lib/high/Keccak",
     "/ext/xkcp/lib/low/KeccakP-1600/Optimized64/KeccakP-1600-opt64.c",
     "/ext/secp256k1/src/secp256k1.c",
     "ext/xkcp/lib/common", 
