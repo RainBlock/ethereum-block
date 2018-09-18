@@ -18,6 +18,9 @@ addons:
     - g++-4.8
 before_install:
 - sh -e /etc/init.d/xvfb start
+cache:
+  directories:
+    - node_modules
 matrix:
   fast_finish: true
   include:

@@ -1,6 +1,6 @@
 {
   "name": "@rainblock/ethereum-block",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "An implementation of the Ethereum schema for typescript",
   "main": "dist/node.js",
   "browser": {
@@ -97,6 +97,7 @@
     "ext/xkcp/lib/low/KeccakP-1600/Optimized", 
     "ext/xkcp/lib/low/common", 
     "ext/secp256k1/include",
+    "ext/secp256k1/src",
     "src/*.c",
     "binding.gyp"
   ], "gypfile" : true
