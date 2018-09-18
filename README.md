@@ -17,7 +17,7 @@ Add @rainblock/ethereum-block to your project with:
 Basic API documentation can be found [here](https://rainblock.github.io/ethereum-block/), but the following example shows basic use:
 
 ```typescript
-import {decodeBlock} from './ethereum-block';
+import {decodeBlock} from '@rainblock/ethereum-block';
 
 // Block decoded to RLP format by RLP-Stream
 const rlpBlock : RlpList = RlpDecode(raw);
