@@ -7,7 +7,7 @@ const keccak = require('keccak');
 
 interface NativeInterface {
   recoverFromAddress(verifyBlock: Buffer, signature: Buffer, recovery: boolean):
-      BigInt;
+      bigint;
 }
 
 let native: NativeInterface;
@@ -39,7 +39,7 @@ export interface EthereumBlockDecoderOptions {
    * For decoding a block, which block number EIP-155 semantics automatically
    * applies.
    */
-  eip155Block: BigInt;
+  eip155Block: bigint;
   /**
    * For decoding a transaction, whether or not to use EIP-155 semantics to
    * decode the transaction.
@@ -61,60 +61,60 @@ const defaultOptions: EthereumBlockDecoderOptions = {
 /** A header for an Ethereum block. */
 export interface EthereumHeader {
   /** The Keccak 256-bit hash of the parent block’s header, in its entirety. */
-  parentHash: BigInt;
+  parentHash: bigint;
   /** The Keccak 256-bit hash of the ommers list portion of this block. */
-  uncleHash: BigInt;
+  uncleHash: bigint;
   /**
    * The 160-bit address to which all fees collected from the successful mining
    * of this block be transferred.
    */
-  beneficiary: BigInt;
+  beneficiary: bigint;
   /**
    * The Keccak 256-bit hash of the root node of the state trie, after all
    * transactions are executed and finalisations applied.
    */
-  stateRoot: BigInt;
+  stateRoot: bigint;
   /**
    * The Keccak 256-bit hash of the root node of the trie structure populated
    * with each transaction in the transactions list portion of the block.
    */
-  transactionsRoot: BigInt;
+  transactionsRoot: bigint;
   /**
    * The Keccak 256-bit hash of the root node of the trie structure populated
    * with the receipts of each transaction in the transactions list portion of
    * the block.
    */
-  receiptsRoot: BigInt;
+  receiptsRoot: bigint;
   /**
    * The Bloom filter composed from indexable information (logger address and
    * log topics) contained in each log entry from the receipt of each
    * transaction in the transactions list.
    */
-  logsBloom: BigInt;
+  logsBloom: bigint;
   /**
    * A scalar value corresponding to the difficulty level of this block. This
    * can be calculated from the previous block’s difficulty level and the
    * timestamp.
    */
-  difficulty: BigInt;
+  difficulty: bigint;
   /**
    * A scalar value equal to the number of ancestor blocks. The genesis block
    * has a number of zero.
    */
-  blockNumber: BigInt;
+  blockNumber: bigint;
   /**
    * A scalar value equal to the current limit of gas expenditure per block.
    */
-  gasLimit: BigInt;
+  gasLimit: bigint;
   /**
    * A scalar value equal to the total gas used in transactions in this block.
    */
-  gasUsed: BigInt;
+  gasUsed: bigint;
   /**
    * A scalar value equal to the reasonable output of Unix’s time() at this
    * block’s inception.
    */
-  timestamp: BigInt;
+  timestamp: bigint;
   /**
    * An arbitrary byte array containing data relevant to this block. This must
    * be 32 bytes or fewer.
@@ -124,12 +124,12 @@ export interface EthereumHeader {
    * A 256-bit hash which proves combined with the nonce that a sufficient
    * amount of computation has been carried out on this block.
    */
-  mixHash: BigInt;
+  mixHash: bigint;
   /**
    * A 64-bit hash which proves combined with the mix-hash that a sufficient
    * amount of computation has been carried out on this block.
    */
-  nonce: BigInt;
+  nonce: bigint;
 }
 
 /** The data stored in a block for a signed Ethereum transaction */
@@ -139,29 +139,29 @@ export interface EthereumTransaction {
    * or, in the case of accounts with associated code, the number of
    * contract-creations made by this account.
    */
-  nonce: BigInt;
+  nonce: bigint;
   /**
    * A scalar value equal to the number of Wei to be paid per unit of gas for
    * all computation costs incurred as a result of the execution of this
    * transaction.
    */
-  gasPrice: BigInt;
+  gasPrice: bigint;
   /**
    * A scalar value equal to the maximum amount of gas that should be used in
    * executing this transaction.
    */
-  gasLimit: BigInt;
+  gasLimit: bigint;
   /**
    * A scalar value equal to the number of Wei to be transferred to the message
    * call’s recipient or, in the case of contract creation, as an endowment to
    * the newly created account.
    */
-  value: BigInt;
+  value: bigint;
   /**
    * The 160-bit address of the message call’s recipient or, for a contract
    * creation transaction, 0.
    */
-  to: BigInt;
+  to: bigint;
   /**
    * An unlimited size byte array specifying the EVM-code for the account
    * initialisation procedure, for a contract transaction, or an unlimited size
@@ -170,7 +170,7 @@ export interface EthereumTransaction {
    */
   data: Buffer;
   /** The 160-bit address of the message caller. */
-  from: BigInt;
+  from: bigint;
 }
 
 export class EthereumBlockDecoderError extends Error {
@@ -298,7 +298,7 @@ export function decodeTransaction(
         (transaction[TRANSACTION_DATA] as Buffer)
       ]);
 
-  let from: BigInt;
+  let from: bigint;
   if (process.browser || native === undefined || !options.native) {
     const hash = keccak('keccak256').update(toHash).digest();
     // Recover and decompress the public key
