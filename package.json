@@ -17,6 +17,7 @@
     "benchmark": "node -r ts-node/register src/ethereum-block.bench.ts",
     "rebuild": "node-gyp rebuild",
     "prepublish": "npm run compile",
+    "preinstall": "npm run rebuild",
     "typedoc": "typedoc --out docs $(pwd)/src $(pwd)/helper --target es6 --mode file --tsconfig ./tsconfig.json --excludePrivate --excludeProtected --excludeNotExported --exclude '**/*+(spec|bench).ts'",
     "check": "gts check",
     "clean": "gts clean",

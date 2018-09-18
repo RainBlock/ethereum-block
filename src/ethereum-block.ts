@@ -299,7 +299,7 @@ export function decodeTransaction(
       ]);
 
   let from: BigInt;
-  if (process.browser || !options.native) {
+  if (process.browser || native === undefined || !options.native) {
     const hash = keccak('keccak256').update(toHash).digest();
     // Recover and decompress the public key
     const pubKey = secp256k1.recover(hash, signature, recovery, false).slice(1);
