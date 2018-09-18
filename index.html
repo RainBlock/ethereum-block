@@ -1,0 +1,197 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>@rainblock/ethereum-block</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">@rainblock/ethereum-block</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1> @rainblock/ethereum-block</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<h1 id="-rainblock-s-ethereum-block-decoder">☔️📦  RainBlock&#39;s Ethereum Block Decoder</h1>
+				<p><a href="https://www.npmjs.org/package/@rainblock/ethereum-block"><img src="https://img.shields.io/npm/v/@rainblock/ethereum-block.svg?style=flat-square" alt="NPM Package"></a>
+					<a href="https://travis-ci.com/RainBlock/ethereum-block"><img src="https://img.shields.io/travis/com/RainBlock/ethereum-block.svg?branch=master&style=flat-square" alt="Build Status"></a>
+				<a href="https://coveralls.io/r/RainBlock/ethereum-block"><img src="https://img.shields.io/coveralls/RainBlock/ethereum-block.svg?style=flat-square" alt="Coverage Status"></a></p>
+				<p><a href="https://www.npmjs.org/package/@rainblock/ethereum-block">@rainblock/ethereum-block</a> is a decoder for the Ethereum block format. It uses native bindings to improve the performance of transaction verification. A fallback is provided when bindings cannot be used. Native bindings provide about a 30-50% speedup over pure javascript. Unlike the <a href="https://github.com/ethereumjs">EthereumJS</a> <a href="https://github.com/ethereumjs/ethereum-block">library</a> the API exports BigInts. Typescript definitions are provided.</p>
+				<h1 id="install">Install</h1>
+				<p>Add @rainblock/ethereum-block to your project with:</p>
+				<blockquote>
+					<p><code>npm install @rainblock/ethereum-block</code></p>
+				</blockquote>
+				<h1 id="usage">Usage</h1>
+				<p>Basic API documentation can be found <a href="https://rainblock.github.io/ethereum-block/">here</a>, but the following example shows basic use:</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> {decodeBlock} <span class="hljs-keyword">from</span> <span class="hljs-string">'./ethereum-block'</span>;
+
+<span class="hljs-comment">// Block decoded to RLP format by RLP-Stream</span>
+<span class="hljs-keyword">const</span> rlpBlock : RlpList = RlpDecode(raw);
+<span class="hljs-keyword">const</span> block : EthereumBlock = decodeBlock(rlpBlock);</code></pre>
+				<h1 id="benchmarks">Benchmarks</h1>
+				<p>Benchmarks can be run by executing <code>npm run benchmark</code> from the package directory.</p>
+				<p>An example run on a 2016 15-inch Macbook:</p>
+				<pre><code>no-op: <span class="hljs-number">795262551</span>±<span class="hljs-number">0</span>.<span class="hljs-number">22</span>% ops/s <span class="hljs-number">1</span>.<span class="hljs-number">26±0.013</span> ns/op (<span class="hljs-number">91</span> runs)
+decodeBlock: <span class="hljs-number">159±0.95</span>% ops/s <span class="hljs-number">6304084.39</span>±<span class="hljs-number">271699</span>.<span class="hljs-number">554</span> ns/op (<span class="hljs-number">79</span> runs)
+decodeHeader: <span class="hljs-number">305267±5</span>.<span class="hljs-number">32</span>% ops/s <span class="hljs-number">3275</span>.<span class="hljs-number">82</span>±<span class="hljs-number">799.828</span> ns/op (<span class="hljs-number">81</span> runs)
+decodeTx (js): <span class="hljs-number">8450±1.97</span>% ops/s <span class="hljs-number">118344.55</span>±<span class="hljs-number">11168.747</span> ns/op (<span class="hljs-number">88</span> runs)
+decodeTx (native): <span class="hljs-number">12455±1.08</span>% ops/s <span class="hljs-number">80287.49</span>±<span class="hljs-number">4157.742</span> ns/op (<span class="hljs-number">89</span> runs)</code></pre><p>Native is about 30-50% faster than the pure js version.</p>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-class">
+						<a href="classes/ethereumblockdecodererror.html" class="tsd-kind-icon">Ethereum<wbr>Block<wbr>Decoder<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ethereumblock.html" class="tsd-kind-icon">Ethereum<wbr>Block</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ethereumblockdecoderoptions.html" class="tsd-kind-icon">Ethereum<wbr>Block<wbr>Decoder<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ethereumheader.html" class="tsd-kind-icon">Ethereum<wbr>Header</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ethereumtransaction.html" class="tsd-kind-icon">Ethereum<wbr>Transaction</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#decodeblock" class="tsd-kind-icon">decode<wbr>Block</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#decodeheader" class="tsd-kind-icon">decode<wbr>Header</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#decodetransaction" class="tsd-kind-icon">decode<wbr>Transaction</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>
