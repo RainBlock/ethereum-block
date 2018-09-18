@@ -1,6 +1,6 @@
 {
   "name": "@rainblock/ethereum-block",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "An implementation of the Ethereum schema for typescript",
   "main": "dist/node.js",
   "browser": {
@@ -16,7 +16,7 @@
     "test:node": "mocha -r ts-node/register src/**/*.spec.ts --timeout 40000",
     "benchmark": "node -r ts-node/register src/ethereum-block.bench.ts",
     "rebuild": "node-gyp rebuild",
-    "prepublish": "npm run compile",
+    "prepublishOnly": "npm run compile",
     "preinstall": "npm run rebuild",
     "typedoc": "typedoc --out docs $(pwd)/src $(pwd)/helper --target es6 --mode file --tsconfig ./tsconfig.json --excludePrivate --excludeProtected --excludeNotExported --exclude '**/*+(spec|bench).ts'",
     "check": "gts check",
@@ -96,6 +96,7 @@
     "ext/xkcp/lib/low/KeccakP-1600/Optimized64/LCufullshld",  
     "ext/xkcp/lib/low/KeccakP-1600/Optimized", 
     "ext/xkcp/lib/low/common", 
-    "ext/secp256k1/include"
-  ]
+    "ext/secp256k1/include",
+    "binding.gyp"
+  ], "gypfile" : true
 }
