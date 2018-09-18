@@ -262,8 +262,8 @@ export function decodeTransaction(
   }
 
   const signature = Buffer.alloc(64, 0);
-  r.copy(signature, 0);
-  s.copy(signature, 32);
+  r.copy(signature, 32 - r.length);
+  s.copy(signature, 64 - s.length);
 
   const chainV = options.chainId * 2 + 35;
   const verifySignature =

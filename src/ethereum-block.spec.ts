@@ -20,6 +20,7 @@ chai.should();
 
 const GENESIS_BLOCK = 'test_data/genesis.bin';
 const BLOCK_1M = 'test_data/1M.bin';
+const BLOCK_47221 = 'test_data/47221.bin';
 const BLOCK_4M = 'test_data/4M.bin';
 const BLOCK_FIRST10 = 'test_data/first10.bin';
 
@@ -113,6 +114,32 @@ describe('Decode block 4M', async () => {
     assertEquals(
         block.transactions[1].from,
         BigInt('0x7ed1e469fcb3ee19c0366d829e291451be638e59'));
+  });
+});
+
+
+describe('Decode block 47221', async () => {
+  let block: EthereumBlock;
+
+  before(async () => {
+    block = decodeBlock(
+        (await asyncChunks(await loadStream(BLOCK_47221)).next()).value);
+  });
+
+  it('should have correct miner', async () => {
+    assertEquals(
+        block.header.beneficiary,
+        BigInt('0x72e3ea8234b449531a581f05f1c1e07cceb559d2'));
+  });
+
+  it('should have 1 transaction', async () => {
+    block.transactions.length.should.equal(1);
+  });
+
+  it('transaction 0 from field should be correct', async () => {
+    assertEquals(
+        block.transactions[0].from,
+        BigInt('0xdcd8aa0e6fd68b057c5ac5e362619808a175ce87'));
   });
 });
 
