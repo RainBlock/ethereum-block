@@ -58,6 +58,8 @@ const defaultOptions: EthereumBlockDecoderOptions = {
   native: true
 };
 
+export const CONTRACT_CREATION: bigint = BigInt(-1);
+
 /** A header for an Ethereum block. */
 export interface EthereumHeader {
   /** The Keccak 256-bit hash of the parent block’s header, in its entirety. */
@@ -159,7 +161,8 @@ export interface EthereumTransaction {
   value: bigint;
   /**
    * The 160-bit address of the message call’s recipient or, for a contract
-   * creation transaction, 0.
+   * creation transaction, CONTRACT_CREATION (-1), to distinguish against
+   * account 0x0000000000000000000000000000000000000000.
    */
   to: bigint;
   /**
@@ -315,11 +318,13 @@ export function decodeTransaction(
   } else {
     from = native.recoverFromAddress(toHash, signature, recovery === 1);
   }
+
+  const toBuffer = transaction[TRANSACTION_TO] as Buffer;
   return {
     nonce: toBigIntBE(transaction[TRANSACTION_NONCE] as Buffer),
     gasPrice: toBigIntBE(transaction[TRANSACTION_GASPRICE] as Buffer),
     gasLimit: toBigIntBE(transaction[TRANSACTION_STARTGAS] as Buffer),
-    to: toBigIntBE(transaction[TRANSACTION_TO] as Buffer),
+    to: toBuffer.length === 0 ? BigInt(-1) : toBigIntBE(toBuffer),
     value: toBigIntBE(transaction[TRANSACTION_VALUE] as Buffer),
     data: transaction[TRANSACTION_DATA] as Buffer,
     from

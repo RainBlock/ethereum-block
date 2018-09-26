@@ -7,7 +7,7 @@ const fs = process.browser ? undefined : require('fs-extra');
 const get = process.browser ? require('simple-get') : undefined;
 
 import {RlpDecoderTransform} from 'rlp-stream';
-import {EthereumBlock, decodeBlock} from './ethereum-block';
+import {EthereumBlock, decodeBlock, CONTRACT_CREATION} from './ethereum-block';
 import {Readable} from 'stream';
 
 const asyncChunks = require('async-chunks');
@@ -20,7 +20,9 @@ chai.should();
 
 const GENESIS_BLOCK = 'test_data/genesis.bin';
 const BLOCK_1M = 'test_data/1M.bin';
+const BLOCK_46420 = 'test_data/46420.bin';
 const BLOCK_47221 = 'test_data/47221.bin';
+const BLOCK_49018 = 'test_data/49018.bin';
 const BLOCK_4M = 'test_data/4M.bin';
 const BLOCK_FIRST10 = 'test_data/first10.bin';
 
@@ -117,6 +119,24 @@ describe('Decode block 4M', async () => {
   });
 });
 
+describe('Decode block 46420', async () => {
+  let block: EthereumBlock;
+
+  before(async () => {
+    block = decodeBlock(
+        (await asyncChunks(await loadStream(BLOCK_46420)).next()).value);
+  });
+
+  it('should have 1 transaction', async () => {
+    block.transactions.length.should.equal(1);
+  });
+
+  it('transaction 0 to field should be 0', async () => {
+    assertEquals(block.transactions[0].to, BigInt('0'));
+  });
+});
+
+
 
 describe('Decode block 47221', async () => {
   let block: EthereumBlock;
@@ -140,6 +160,23 @@ describe('Decode block 47221', async () => {
     assertEquals(
         block.transactions[0].from,
         BigInt('0xdcd8aa0e6fd68b057c5ac5e362619808a175ce87'));
+  });
+});
+
+describe('Decode block 49018', async () => {
+  let block: EthereumBlock;
+
+  before(async () => {
+    block = decodeBlock(
+        (await asyncChunks(await loadStream(BLOCK_49018)).next()).value);
+  });
+
+  it('should have 1 transaction', async () => {
+    block.transactions.length.should.equal(1);
+  });
+
+  it('transaction 0 to field should be CONTRACT_CREATION', async () => {
+    assertEquals(block.transactions[0].to, CONTRACT_CREATION);
   });
 });
 
