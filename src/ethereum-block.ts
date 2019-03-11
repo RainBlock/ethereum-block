@@ -132,6 +132,10 @@ export interface EthereumHeader {
    * amount of computation has been carried out on this block.
    */
   nonce: bigint;
+  /**
+   * A boolean which determines if the block is genesis block
+   */
+  isGenesis: boolean;
 }
 
 /** The data stored in a block for a signed Ethereum transaction */
@@ -227,7 +231,11 @@ export function decodeHeader(header: RlpList): EthereumHeader {
     timestamp: toBigIntBE(header[HEADER_TIMESTAMP] as Buffer),
     extraData: (header[HEADER_EXTRADATA] as Buffer).toString('ascii'),
     mixHash: toBigIntBE(header[HEADER_MIXHASH] as Buffer),
-    nonce: toBigIntBE(header[HEADER_NONCE] as Buffer)
+    nonce: toBigIntBE(header[HEADER_NONCE] as Buffer),
+    isGenesis:
+        (toBigIntBE(header[HEADER_BLOCK_NUMBER] as Buffer) === BigInt(0)) ?
+        true :
+        false
   };
 }
 

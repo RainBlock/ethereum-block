@@ -18,13 +18,14 @@
     "rebuild": "node-gyp rebuild",
     "prepublishOnly": "npm run compile",
     "preinstall": "npm run rebuild",
-    "typedoc": "typedoc --out docs $(pwd)/src $(pwd)/helper --target es6 --mode file --tsconfig ./tsconfig.json --excludePrivate --excludeProtected --excludeNotExported --exclude '**/*+(spec|bench).ts'",
+    "typedoc": "typedoc --out docs $(pwd)/src --target es6 --mode file --tsconfig ./tsconfig.json --excludePrivate --excludeProtected --excludeNotExported --exclude '**/*+(spec|bench).ts'",
     "check": "gts check",
     "clean": "gts clean",
     "compile": "mkdir -p dist; tsc -p .;rollup -c > dist/node.js && BROWSER=true rollup -c > dist/browser.js; cp build/src/*.d.ts dist",
     "fix": "gts fix",
     "pretest": "npm run compile",
-    "posttest": "npm run check"
+    "posttest": "npm run check",
+    "prepare": "git submodule init; git submodule update"
   },
   "repository": {
     "type": "git",
@@ -76,8 +77,8 @@
     "tape": "^4.4.0",
     "ts-loader": "^4.5.0",
     "ts-node": "^7.0.1",
-    "typedoc": "^0.12.0",
-    "typescript": "calebsander/TypeScript#feature/bigint-lkg",
+    "typedoc": "^0.14.0",
+    "typescript": "^3.3.3333",
     "webpack": "^4.16.5",
     "webpack-cli": "^3.1.0"
   },
