@@ -79,8 +79,8 @@
     "ts-node": "^7.0.1",
     "typedoc": "^0.14.0",
     "typescript": "^3.3.3333",
-    "webpack": "^4.16.5",
-    "webpack-cli": "^3.1.0"
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.2.3"
   },
   "publishConfig": {
     "access": "public"
