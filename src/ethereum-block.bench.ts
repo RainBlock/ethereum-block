@@ -44,6 +44,37 @@ const runSuite =
       suite.run();
     };
 
+
+interface BenchmarkDeferrable {
+  resolve: () => void;
+}
+
+/**
+ * Simple wrapper for benchmark.js to add an asynchronous test.
+ *  @param name         The name of the test to run.
+ *  @param asyncTest    An async function which contains the test to be run. If
+ * a setup function is provided, the state will be present in the {state}
+ * parameter. Otherwise, the {state} parameter will be undefined.
+ *  @param setup        Optional setup which provides state to {asyncTest}.
+ */
+const addAsyncTest = <T>(
+    name: string, asyncTest: (state: T) => Promise<void>, setup?: () => T) => {
+  let state: T;
+  suite.add(name, {
+    defer: true,
+    setup: () => {
+      if (setup !== undefined) {
+        state = setup();
+      }
+    },
+    fn: (deferred: BenchmarkDeferrable) => {
+      asyncTest(state).then(() => deferred.resolve());
+    }
+  });
+};
+
+
+
 const suite = new benchmark.Suite();
 // Tests the performance of a no-op.
 suite.add('no-op', () => {});
@@ -51,10 +82,10 @@ suite.add('no-op', () => {});
 // Load a txn
 const block =
     RlpDecode(fs.readFileSync(path.join(__dirname, 'test_data/4M.bin')));
-suite.add('decodeBlock', () => {
-  decodeBlock(block as RlpList);
+addAsyncTest('decodeBlock', async () => {
+  await decodeBlock(block as RlpList);
 });
-suite.add('decodeHeader', () => {
+addAsyncTest('decodeHeader', async () => {
   decodeHeader(block[0] as RlpList);
 });
 
@@ -65,8 +96,8 @@ const jsOptions: EthereumBlockDecoderOptions = {
   native: false
 };
 
-suite.add('decodeTx (js)', () => {
-  decodeTransaction((block[1] as RlpList)[0] as RlpList, jsOptions);
+addAsyncTest('decodeTx (js)', async () => {
+  await decodeTransaction((block[1] as RlpList)[0] as RlpList, jsOptions);
 });
 
 const nativeOptions: EthereumBlockDecoderOptions = {
@@ -76,7 +107,7 @@ const nativeOptions: EthereumBlockDecoderOptions = {
   native: true
 };
 
-suite.add('decodeTx (native)', () => {
+addAsyncTest('decodeTx (native)', async () => {
   decodeTransaction((block[1] as RlpList)[0] as RlpList, nativeOptions);
 });
 

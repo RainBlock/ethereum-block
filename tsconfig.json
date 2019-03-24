@@ -4,8 +4,8 @@
     "rootDir": ".",
     "outDir": "build",
     "target" : "esnext",
-    "lib" : [ "esnext"],
-    "sourceMap": true
+    "lib" : [ "es2017", "esnext.bigint" ],
+    "sourceMap": true,
   },
   "include": [
     "src/*.ts",
