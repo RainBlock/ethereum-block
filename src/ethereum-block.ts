@@ -7,7 +7,7 @@ const keccak = require('keccak');
 
 interface NativeInterface {
   recoverFromAddress(verifyBlock: Buffer, signature: Buffer, recovery: boolean):
-      bigint;
+      Promise<bigint>;
 }
 
 let native: NativeInterface;
@@ -249,10 +249,10 @@ const TRANSACTION_S = 8;
  *
  * @returns A validated and decoded EthereumTransaction.
  */
-export function decodeTransaction(
+export async function decodeTransaction(
     transaction: RlpList,
     options: EthereumBlockDecoderOptions =
-        defaultOptions): EthereumTransaction {
+        defaultOptions): Promise<EthereumTransaction> {
   const v = transaction[TRANSACTION_V] as Buffer;
   const r = transaction[TRANSACTION_R] as Buffer;
   const s = transaction[TRANSACTION_S] as Buffer;
@@ -316,7 +316,7 @@ export function decodeTransaction(
       throw new EthereumBlockDecoderError(`Failed to get from account`);
     }
   } else {
-    from = native.recoverFromAddress(toHash, signature, recovery === 1);
+    from = await native.recoverFromAddress(toHash, signature, recovery === 1);
   }
 
   const toBuffer = transaction[TRANSACTION_TO] as Buffer;
@@ -339,9 +339,9 @@ export function decodeTransaction(
  *
  * @returns A validated and decoded EthereumTransaction.
  */
-export function decodeBlock(
-    rlp: RlpList,
-    options: EthereumBlockDecoderOptions = defaultOptions): EthereumBlock {
+export async function decodeBlock(
+    rlp: RlpList, options: EthereumBlockDecoderOptions = defaultOptions):
+    Promise<EthereumBlock> {
   // Each incoming block should be an RLP list.
   if (!Array.isArray(rlp)) {
     throw new EthereumBlockDecoderError(`Expected RLP-encoded list!`);
@@ -354,8 +354,10 @@ export function decodeBlock(
   if (header.blockNumber >= defaultOptions.eip155Block) {
     defaultOptions.eip155 = true;
   }
-  const transactions: EthereumTransaction[] =
+  const transactionPromises: Array<Promise<EthereumTransaction>> =
       (rlp[1] as RlpList).map(tx => decodeTransaction(tx as RlpList, options));
+  const transactions: EthereumTransaction[] =
+      await Promise.all(transactionPromises);
   const uncles: EthereumHeader[] =
       (rlp[2] as RlpList).map(buf => decodeHeader(buf as RlpList));
 

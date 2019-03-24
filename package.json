@@ -1,6 +1,6 @@
 {
   "name": "@rainblock/ethereum-block",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "An implementation of the Ethereum schema for typescript",
   "main": "dist/node.js",
   "browser": {
@@ -61,7 +61,7 @@
     "ethereumjs-util": "^5.0.0",
     "gts": "^0.5.4",
     "istanbul": "^0.4.1",
-    "karma": "^3.0.0",
+    "karma": "^4.0.1",
     "karma-chrome-launcher": "^2.2.0",
     "karma-env-preprocessor": "^0.1.1",
     "karma-mocha": "^1.3.0",

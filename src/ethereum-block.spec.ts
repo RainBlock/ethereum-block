@@ -56,7 +56,7 @@ describe('Decode binary genesis block', async () => {
   let block: EthereumBlock;
 
   before(async () => {
-    block = decodeBlock(
+    block = await decodeBlock(
         (await asyncChunks(await loadStream(GENESIS_BLOCK)).next()).value);
   });
 
@@ -73,7 +73,7 @@ describe('Decode block 1M', async () => {
   let block: EthereumBlock;
 
   before(async () => {
-    block = decodeBlock(
+    block = await decodeBlock(
         (await asyncChunks(await loadStream(BLOCK_1M)).next()).value);
   });
 
@@ -92,7 +92,7 @@ describe('Decode block 4M', async () => {
   let block: EthereumBlock;
 
   before(async () => {
-    block = decodeBlock(
+    block = await decodeBlock(
         (await asyncChunks(await loadStream(BLOCK_4M)).next()).value);
   });
 
@@ -123,7 +123,7 @@ describe('Decode block 46420', async () => {
   let block: EthereumBlock;
 
   before(async () => {
-    block = decodeBlock(
+    block = await decodeBlock(
         (await asyncChunks(await loadStream(BLOCK_46420)).next()).value);
   });
 
@@ -142,7 +142,7 @@ describe('Decode block 47221', async () => {
   let block: EthereumBlock;
 
   before(async () => {
-    block = decodeBlock(
+    block = await decodeBlock(
         (await asyncChunks(await loadStream(BLOCK_47221)).next()).value);
   });
 
@@ -167,7 +167,7 @@ describe('Decode block 49018', async () => {
   let block: EthereumBlock;
 
   before(async () => {
-    block = decodeBlock(
+    block = await decodeBlock(
         (await asyncChunks(await loadStream(BLOCK_49018)).next()).value);
   });
 
@@ -186,7 +186,7 @@ describe('Decode first 10 blocks', async () => {
 
   before(async () => {
     for await (const chunk of asyncChunks(await loadStream(BLOCK_FIRST10))) {
-      blocks.push(decodeBlock(chunk));
+      blocks.push(await decodeBlock(chunk));
     }
   });
 
