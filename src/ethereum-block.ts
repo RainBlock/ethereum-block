@@ -1,4 +1,4 @@
-import {toBigIntBE} from 'bigint-buffer';
+import {toBigIntBE, toBufferBE} from 'bigint-buffer';
 import {RlpEncode, RlpList} from 'rlp-stream';
 import * as secp256k1 from 'secp256k1';
 declare var process: {browser: boolean;};
@@ -92,7 +92,7 @@ export interface EthereumHeader {
    * log topics) contained in each log entry from the receipt of each
    * transaction in the transactions list.
    */
-  logsBloom: bigint;
+  logsBloom: Buffer;
   /**
    * A scalar value corresponding to the difficulty level of this block. This
    * can be calculated from the previous block’s difficulty level and the
@@ -121,7 +121,7 @@ export interface EthereumHeader {
    * An arbitrary byte array containing data relevant to this block. This must
    * be 32 bytes or fewer.
    */
-  extraData: string;
+  extraData: Buffer;
   /**
    * A 256-bit hash which proves combined with the nonce that a sufficient
    * amount of computation has been carried out on this block.
@@ -219,13 +219,13 @@ export function decodeHeader(header: RlpList): EthereumHeader {
     stateRoot: toBigIntBE(header[HEADER_STATE_ROOT] as Buffer),
     transactionsRoot: toBigIntBE(header[HEADER_TRANSACTIONS_ROOT] as Buffer),
     receiptsRoot: toBigIntBE(header[HEADER_RECEIPTS_ROOT] as Buffer),
-    logsBloom: toBigIntBE(header[HEADER_LOGSBLOOM] as Buffer),
+    logsBloom: header[HEADER_LOGSBLOOM] as Buffer,
     difficulty: toBigIntBE(header[HEADER_DIFFICULTY] as Buffer),
     blockNumber: toBigIntBE(header[HEADER_BLOCK_NUMBER] as Buffer),
     gasLimit: toBigIntBE(header[HEADER_GAS_LIMIT] as Buffer),
     gasUsed: toBigIntBE(header[HEADER_GAS_USED] as Buffer),
     timestamp: toBigIntBE(header[HEADER_TIMESTAMP] as Buffer),
-    extraData: (header[HEADER_EXTRADATA] as Buffer).toString('ascii'),
+    extraData: (header[HEADER_EXTRADATA] as Buffer),
     mixHash: toBigIntBE(header[HEADER_MIXHASH] as Buffer),
     nonce: toBigIntBE(header[HEADER_NONCE] as Buffer)
   };
@@ -362,4 +362,70 @@ export async function decodeBlock(
       (rlp[2] as RlpList).map(buf => decodeHeader(buf as RlpList));
 
   return {header, transactions, uncles} as EthereumBlock;
+}
+
+/**
+ * Remove leading null bytes from a buffer.
+ *
+ * @param buf Buffer to remove null bytes from
+ *
+ * @returns   A slice of the buffer without null bytes.
+ */
+function removeNullPrefix(buf: Buffer): Buffer {
+  for (let i = 0; i < buf.length; i++) {
+    if (buf[i] !== 0) {
+      return buf.slice(i);
+    }
+  }
+  return Buffer.from([]);
+}
+
+/**
+ * Encodes an Ethereum header as a RLP list
+ *
+ * @param header  The Ethreum header to encode.
+ *
+ * @return A RlpList with the encoded Ethereum header.
+ */
+export function encodeHeaderAsRLP(header: EthereumHeader): RlpList {
+  const asRlpList: RlpList = [];
+  asRlpList[HEADER_PARENT_HASH] = toBufferBE(header.parentHash, 32);
+  asRlpList[HEADER_UNCLE_HASH] = toBufferBE(header.uncleHash, 32);
+  asRlpList[HEADER_BENEFICIARY] = toBufferBE(header.beneficiary, 20);
+  asRlpList[HEADER_STATE_ROOT] = toBufferBE(header.stateRoot, 32);
+  asRlpList[HEADER_TRANSACTIONS_ROOT] = toBufferBE(header.transactionsRoot, 32);
+  asRlpList[HEADER_RECEIPTS_ROOT] = toBufferBE(header.receiptsRoot, 32);
+  asRlpList[HEADER_LOGSBLOOM] = header.logsBloom;
+  asRlpList[HEADER_DIFFICULTY] =
+      removeNullPrefix(toBufferBE(header.difficulty, 32));
+  asRlpList[HEADER_BLOCK_NUMBER] =
+      removeNullPrefix(toBufferBE(header.blockNumber, 32));
+  asRlpList[HEADER_GAS_LIMIT] =
+      removeNullPrefix(toBufferBE(header.gasLimit, 32));
+  asRlpList[HEADER_GAS_USED] = removeNullPrefix(toBufferBE(header.gasUsed, 32));
+  asRlpList[HEADER_TIMESTAMP] =
+      removeNullPrefix(toBufferBE(header.timestamp, 32));
+  asRlpList[HEADER_EXTRADATA] = header.extraData;
+  asRlpList[HEADER_MIXHASH] = removeNullPrefix(toBufferBE(header.mixHash, 32));
+  asRlpList[HEADER_NONCE] = removeNullPrefix(toBufferBE(header.nonce, 32));
+  return asRlpList;
+}
+
+/**
+ * Encodes a new block. Transactions must be encoded and signed as a RLPList
+ *
+ * @param header        The Ethreum header to encode.
+ * @param transactions  Encoded, signed transactions to include
+ * @param uncleList     A list of uncles to include
+ *
+ * @return A new RLP encoded Ethereum block.
+ */
+export function encodeBlock(
+    header: EthereumHeader, transactions: RlpList,
+    uncleList: EthereumHeader[]): Buffer {
+  const asRlpList: RlpList = [
+    encodeHeaderAsRLP(header), transactions,
+    uncleList.map(uncle => encodeHeaderAsRLP(uncle))
+  ];
+  return RlpEncode(asRlpList);
 }

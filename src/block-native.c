@@ -146,7 +146,7 @@ napi_value recover_from_address(napi_env env, napi_callback_info info) {
 
   work->transaction = (uint8_t*) malloc(length);
   memcpy(work->transaction, data, length);
-  work->transaction_size = length;;
+  work->transaction_size = length;
   memcpy(work->signature, signature, 64);
   work->recovery = recovery;
 
