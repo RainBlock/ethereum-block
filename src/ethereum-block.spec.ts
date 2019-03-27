@@ -6,8 +6,8 @@ import * as path from 'path';
 const fs = process.browser ? undefined : require('fs-extra');
 const get = process.browser ? require('simple-get') : undefined;
 
-import {RlpDecoderTransform} from 'rlp-stream';
-import {EthereumBlock, decodeBlock, CONTRACT_CREATION} from './ethereum-block';
+import {RlpDecoderTransform, RlpList, RlpEncode} from 'rlp-stream';
+import {EthereumBlock, decodeBlock, CONTRACT_CREATION, encodeBlock} from './ethereum-block';
 import {Readable} from 'stream';
 
 const asyncChunks = require('async-chunks');
@@ -25,6 +25,22 @@ const BLOCK_47221 = 'test_data/47221.bin';
 const BLOCK_49018 = 'test_data/49018.bin';
 const BLOCK_4M = 'test_data/4M.bin';
 const BLOCK_FIRST10 = 'test_data/first10.bin';
+
+const loadFile = async(filename: string): Promise<Buffer> => {
+  if (process.browser) {
+    return await new Promise((resolve, reject) => {
+      get.concat(
+          `base/src/${filename}`, (err: string, res: string, data: Buffer) => {
+            if (err) {
+              reject(err);
+            }
+            resolve(data);
+          });
+    });
+  } else {
+    return await fs.promises.readFile(path.join(__dirname, filename));
+  }
+};
 
 const loadStream = async (filename: string) => {
   const decoder = new RlpDecoderTransform();
@@ -206,5 +222,23 @@ describe('Decode first 10 blocks', async () => {
 
   it('block 9 should have no transactions', async () => {
     blocks[9].transactions.length.should.equal(0);
+  });
+});
+
+
+describe('Encode block 1M', async () => {
+  let block: EthereumBlock;
+  let originalData: Buffer;
+  let originalRlp: RlpList;
+  before(async () => {
+    originalData = await loadFile(BLOCK_1M);
+    originalRlp = (await asyncChunks(await loadStream(BLOCK_1M)).next()).value;
+    block = await decodeBlock(originalRlp);
+  });
+
+  it('should encode back into the same block', async () => {
+    const result =
+        encodeBlock(block.header, originalRlp[1] as RlpList, block.uncles);
+    result.equals(originalData).should.be.true;
   });
 });
