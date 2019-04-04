@@ -406,8 +406,8 @@ export function encodeHeaderAsRLP(header: EthereumHeader): RlpList {
   asRlpList[HEADER_TIMESTAMP] =
       removeNullPrefix(toBufferBE(header.timestamp, 32));
   asRlpList[HEADER_EXTRADATA] = header.extraData;
-  asRlpList[HEADER_MIXHASH] = removeNullPrefix(toBufferBE(header.mixHash, 32));
-  asRlpList[HEADER_NONCE] = removeNullPrefix(toBufferBE(header.nonce, 32));
+  asRlpList[HEADER_MIXHASH] = toBufferBE(header.mixHash, 32);
+  asRlpList[HEADER_NONCE] = toBufferBE(header.nonce, 8);
   return asRlpList;
 }
 
