@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import {RlpDecode, RlpList} from 'rlp-stream';
 
-import {decodeBlock, decodeHeader, decodeTransaction, EthereumBlockDecoderOptions} from './ethereum-block';
+import {decodeBlock, decodeHeader, decodeTransaction, EthereumBlockDecoderOptions, getPublicAddress, signTransaction} from './ethereum-block';
 
 
 interface BenchmarkRun {
@@ -41,7 +41,7 @@ const runSuite =
         });
       }
       // Runs the test suite
-      suite.run();
+      suite.run({async: true});
     };
 
 
@@ -82,9 +82,16 @@ suite.add('no-op', () => {});
 // Load a txn
 const block =
     RlpDecode(fs.readFileSync(path.join(__dirname, 'test_data/4M.bin')));
-addAsyncTest('decodeBlock', async () => {
+addAsyncTest('decodeBlock (native)', async () => {
   await decodeBlock(block as RlpList);
 });
+
+addAsyncTest('decodeBlock (js)', async () => {
+  await decodeBlock(
+      block as RlpList,
+      {chainId: 1, eip155Block: BigInt(2675000), eip155: true, native: false});
+});
+
 addAsyncTest('decodeHeader', async () => {
   decodeHeader(block[0] as RlpList);
 });
@@ -96,8 +103,13 @@ const jsOptions: EthereumBlockDecoderOptions = {
   native: false
 };
 
-addAsyncTest('decodeTx (js)', async () => {
-  await decodeTransaction((block[1] as RlpList)[0] as RlpList, jsOptions);
+addAsyncTest('decodeTx x4 (js)', async () => {
+  await Promise.all([
+    decodeTransaction((block[1] as RlpList)[0] as RlpList, jsOptions),
+    decodeTransaction((block[1] as RlpList)[0] as RlpList, jsOptions),
+    decodeTransaction((block[1] as RlpList)[0] as RlpList, jsOptions),
+    decodeTransaction((block[1] as RlpList)[0] as RlpList, jsOptions)
+  ]);
 });
 
 const nativeOptions: EthereumBlockDecoderOptions = {
@@ -107,8 +119,56 @@ const nativeOptions: EthereumBlockDecoderOptions = {
   native: true
 };
 
-addAsyncTest('decodeTx (native)', async () => {
-  decodeTransaction((block[1] as RlpList)[0] as RlpList, nativeOptions);
+addAsyncTest('decodeTx x4 (native)', async () => {
+  await Promise.all([
+    decodeTransaction((block[1] as RlpList)[0] as RlpList, nativeOptions),
+    decodeTransaction((block[1] as RlpList)[0] as RlpList, nativeOptions),
+    decodeTransaction((block[1] as RlpList)[0] as RlpList, nativeOptions),
+    decodeTransaction((block[1] as RlpList)[0] as RlpList, nativeOptions)
+  ]);
 });
+
+addAsyncTest('getPublicAddress x4 (native)', async () => {
+  await Promise.all([
+    getPublicAddress(1n), getPublicAddress(1n), getPublicAddress(1n),
+    getPublicAddress(1n)
+  ]);
+});
+
+addAsyncTest('getPublicAddress x4 (js)', async () => {
+  await Promise.all([
+    getPublicAddress(1n, false), getPublicAddress(1n, false),
+    getPublicAddress(1n, false), getPublicAddress(1n, false)
+  ]);
+});
+
+addAsyncTest('signTransaction (native)', async () => {
+  signTransaction(
+      {
+        to: BigInt('0x7e5f4552091a69125d5dfcb7b8c2659029395bdf'),
+        from: BigInt(0),
+        nonce: BigInt(0),
+        gasLimit: BigInt(0),
+        gasPrice: BigInt(0),
+        data: Buffer.from([]),
+        value: BigInt(100)
+      },
+      BigInt(1), 0);
+});
+
+addAsyncTest('signTransaction (js)', async () => {
+  signTransaction(
+      {
+        to: BigInt('0x7e5f4552091a69125d5dfcb7b8c2659029395bdf'),
+        from: BigInt(0),
+        nonce: BigInt(0),
+        gasLimit: BigInt(0),
+        gasPrice: BigInt(0),
+        data: Buffer.from([]),
+        value: BigInt(100)
+      },
+      BigInt(1), 0, false);
+});
+
 
 runSuite(suite, 'basic');

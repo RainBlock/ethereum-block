@@ -7,7 +7,7 @@ const fs = process.browser ? undefined : require('fs-extra');
 const get = process.browser ? require('simple-get') : undefined;
 
 import {RlpDecoderTransform, RlpList, RlpEncode} from 'rlp-stream';
-import {EthereumBlock, decodeBlock, CONTRACT_CREATION, encodeBlock} from './ethereum-block';
+import {EthereumBlock, decodeBlock, CONTRACT_CREATION, encodeBlock, getPublicAddress, signTransaction, decodeTransaction} from './ethereum-block';
 import {Readable} from 'stream';
 
 const asyncChunks = require('async-chunks');
@@ -240,5 +240,32 @@ describe('Encode block 1M', async () => {
     const result =
         encodeBlock(block.header, originalRlp[1] as RlpList, block.uncles);
     result.equals(originalData).should.be.true;
+  });
+});
+
+describe('Sign/encode transactions', async () => {
+  // address for private key 1 is 7e5f4552091a69125d5dfcb7b8c2659029395bdf
+
+  it('should get a public address for a private key', async () => {
+    (await getPublicAddress(BigInt(1)))
+        .toString(16)
+        .should.equal('7e5f4552091a69125d5dfcb7b8c2659029395bdf');
+  });
+
+  it('should sign transaction correctly and recover from address', async () => {
+    const signedRlp = signTransaction(
+        {
+          to: BigInt('0x7e5f4552091a69125d5dfcb7b8c2659029395bdf'),
+          from: BigInt(0),
+          nonce: BigInt(0),
+          gasLimit: BigInt(0),
+          gasPrice: BigInt(0),
+          data: Buffer.from([]),
+          value: BigInt(100)
+        },
+        BigInt(1), 0);
+    const tx = await decodeTransaction(signedRlp);
+    tx.from.toString(16).should.equal(
+        '7e5f4552091a69125d5dfcb7b8c2659029395bdf');
   });
 });
