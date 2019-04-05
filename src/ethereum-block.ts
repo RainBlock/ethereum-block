@@ -8,6 +8,10 @@ const keccak = require('keccak');
 interface NativeInterface {
   recoverFromAddress(verifyBlock: Buffer, signature: Buffer, recovery: boolean):
       Promise<bigint>;
+  getPublicAddress(privateKey: bigint): Promise<bigint>;
+  signTransaction(
+      transaction: Buffer, privateKey: bigint, chainId: number,
+      transactionRlp: RlpList): RlpList;
 }
 
 let native: NativeInterface;
@@ -428,4 +432,70 @@ export function encodeBlock(
     uncleList.map(uncle => encodeHeaderAsRLP(uncle))
   ];
   return RlpEncode(asRlpList);
+}
+
+/**
+ * Get the public address of a given private key.
+ *
+ * @param privateKey    The private key to obtain an address for. It should be a
+ * 256-bit bigint which cannot be 0.
+ * @param useNativeIfAvailable  Set to false to force fallback to js-only code.
+ *
+ * @return The public address for the given private key.
+ */
+export function getPublicAddress(
+    privateKey: bigint, useNativeIfAvailable = true) {
+  if (process.browser || native === undefined || !useNativeIfAvailable) {
+    // Public address is last 20 bytes of the hashed public key (bytes 1-65)
+    const pubKey = secp256k1.publicKeyCreate(toBufferBE(privateKey, 32), false);
+    const hashed = toBigIntBE(
+        keccak('keccak256').update(pubKey.slice(1)).digest().slice(-20));
+    return hashed;
+  }
+  return native.getPublicAddress(privateKey);
+}
+
+/**
+ * Sign an [EthereumTransaction] using a private key.
+ *
+ * @param transaction The transaction to sign. The from field, if present, is
+ * ignored (it will be derived from the private key)
+ * @param privateKey  The private key to sign the transaction with.
+ * @param chainId     The chain id to use. 0=pre EIP-155 semantics. 1=mainnet.
+ * @param useNativeIfAvailable Set to false to force fallback to js-only code.
+ *
+ * @return A [RlpList] representing the transaction. Run this list through
+ * RlpEncode to obtain a [Buffer].
+ */
+export function signTransaction(
+    transaction: EthereumTransaction, privateKey: bigint, chainId = 1,
+    useNativeIfAvailable = true) {
+  const rlpList: RlpList = [
+    removeNullPrefix(toBufferBE(transaction.nonce, 32)),
+    removeNullPrefix(toBufferBE(transaction.gasPrice, 32)),
+    removeNullPrefix(toBufferBE(transaction.gasLimit, 32)),
+    toBufferBE(transaction.to, 32),
+    removeNullPrefix(toBufferBE(transaction.value, 32)), transaction.data
+  ];
+  // EIP-155 transaction
+  if (chainId !== 0) {
+    rlpList[TRANSACTION_V] = Buffer.from([chainId]);
+    rlpList[TRANSACTION_R] = Buffer.from([]);
+    rlpList[TRANSACTION_S] = Buffer.from([]);
+  }
+
+  const toHash = RlpEncode(rlpList);
+  if (process.browser || native === undefined || !useNativeIfAvailable) {
+    const hash = keccak('keccak256').update(toHash).digest();
+    const signature = secp256k1.sign(hash, toBufferBE(privateKey, 32));
+
+    rlpList[TRANSACTION_R] = signature.signature.slice(0, 32);
+    rlpList[TRANSACTION_S] = signature.signature.slice(32, 64);
+    rlpList[TRANSACTION_V] = Buffer.from(
+        [chainId > 0 ? signature.recovery + (chainId * 2 + 35) :
+                       signature.recovery + 27]);
+    return rlpList;
+  } else {
+    return native.signTransaction(toHash, privateKey, chainId, rlpList);
+  }
 }
