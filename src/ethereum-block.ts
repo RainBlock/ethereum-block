@@ -475,7 +475,7 @@ export function signTransaction(
     removeNullPrefix(toBufferBE(transaction.gasPrice, 32)),
     removeNullPrefix(toBufferBE(transaction.gasLimit, 32)),
     transaction.to === CONTRACT_CREATION ? Buffer.from([]) :
-                                           toBufferBE(transaction.to, 32),
+                                           toBufferBE(transaction.to, 20),
     removeNullPrefix(toBufferBE(transaction.value, 32)), transaction.data
   ];
   // EIP-155 transaction
