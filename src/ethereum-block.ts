@@ -490,13 +490,17 @@ export function signTransaction(
     const hash = keccak('keccak256').update(toHash).digest();
     const signature = secp256k1.sign(hash, toBufferBE(privateKey, 32));
 
-    rlpList[TRANSACTION_R] = signature.signature.slice(0, 32);
-    rlpList[TRANSACTION_S] = signature.signature.slice(32, 64);
+    rlpList[TRANSACTION_R] = removeNullPrefix(signature.signature.slice(0, 32));
+    rlpList[TRANSACTION_S] =
+        removeNullPrefix(signature.signature.slice(32, 64));
     rlpList[TRANSACTION_V] = Buffer.from(
         [chainId > 0 ? signature.recovery + (chainId * 2 + 35) :
                        signature.recovery + 27]);
     return rlpList;
   } else {
-    return native.signTransaction(toHash, privateKey, chainId, rlpList);
+    const ret = native.signTransaction(toHash, privateKey, chainId, rlpList);
+    ret[TRANSACTION_R] = removeNullPrefix(ret[TRANSACTION_R] as Buffer);
+    ret[TRANSACTION_S] = removeNullPrefix(ret[TRANSACTION_S] as Buffer);
+    return ret;
   }
 }
